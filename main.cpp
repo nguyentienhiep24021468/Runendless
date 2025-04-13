@@ -8,10 +8,10 @@ using namespace std;
 void waitUntilKeyPressed()
 {
     SDL_Event e;
-    while (SDL_WaitEvent(&e))  // Chỉ thoát khi có sự kiện hợp lệ
+    while (SDL_WaitEvent(&e))
     {
-        if (e.key.keysym.sym == SDLK_SPACE) return;
-        if (e.type == SDL_QUIT) return;
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_x) exit(0);
+        if (e.type == SDL_QUIT) exit(0);
     }
 }
 
@@ -48,7 +48,7 @@ int SDL_main(int argc,  char* argv[])
     }
     Player player;
     InitPlayer(&player);
-    LoadPlayerTexture(&player,"picture/sheetwalk.png","picture/sheetidle.png");
+    LoadPlayerTexture(&player,"picture/sheetwalk.png","picture/sheetidle.png","picture/sheetjump.png","picture/sheetfall.png","picture/sheetbulletbig.png");
 
     bool run=true;
     SDL_Event event;
@@ -58,13 +58,13 @@ int SDL_main(int argc,  char* argv[])
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT) run=false;
-            MovePlayer(&player,&event); // bàn phím
+            MovePlayer(&player,&event);
         }
         UpdateMove(&player);
 
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer,image ,NULL,NULL);
-        RenderPlayer(&player); // player update giá trị
+        RenderPlayer(&player);
         SDL_RenderPresent(renderer);
 
         SDL_Delay(16);
