@@ -1,14 +1,16 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#pragma once
+
 #define WALK_FRAME_COUNT 12
 #define IDLE_FRAME_COUNT 6
 #define JUMP_FRAME_COUNT 4
 #define FALL_FRAME_COUNT 4
 #define FRAME_DELAY 70
+
 #include <SDL2/SDL.h>
 #include "bullet.h"
 #include <vector>
-using namespace std;
+
+
 typedef enum {
     IDLE,
     WALK,
@@ -31,7 +33,7 @@ typedef struct {
     SDL_Texture* fallTexture;
     SDL_Texture* bulletTexture;
     SDL_Rect bulletClips[4];
-    vector <Bullet> bullets;
+    std::vector <Bullet> bullets;
 
     Uint32 lastFrameTime;
     Uint32 frameResetTimer;
@@ -49,6 +51,7 @@ void InitPlayer(Player* p);
 void LoadPlayerTexture(Player* p, const char* walkPath,const char* idlePath, const char*jumpPath,const char* fallPath,const char* bulletPath);
 void MovePlayer(Player* p, SDL_Event* event);
 void UpdateMove(Player* p);
-void RenderPlayer(Player* p);
+void RenderPlayer(Player* p, int camX, int camY);
 
-#endif
+
+

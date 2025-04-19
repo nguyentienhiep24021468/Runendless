@@ -2,9 +2,12 @@
 #include "window.h"
 #include "map.h"
 #include "bullet.h"
-#include <SDL2/SDL_image.h>
 #include <SDL.h>
+#include <SDL_image.h>
 #include <algorithm>
+
+using namespace std;
+
 void InitPlayer(Player* p) {
     p->x = 128;
     p->y = 448;
@@ -114,80 +117,74 @@ void MovePlayer(Player* p, SDL_Event* event)
     }
 }
 
-void UpdateMove(Player* p) {
-    p->vy+=p->gravity;
-    if(p->vy>10) p->vy=10;
 
+
+
+void UpdateMove(Player* p) {
+    const int TILE = 64;
+    const int TOTAL_WIDTH = TILE * 180;
+    const int TOTAL_HEIGHT = TILE * 15;
+
+    p->vy += p->gravity;
+    if (p->vy > 10) p->vy = 10;
 
     float newX = p->x + p->vx;
     float newY = p->y + p->vy;
 
     bool hitX = false;
     for (int i = 0; i <= 1; i++) {
-        int tileTop = (p->y + i * (p->h - 1)) / 64;
-        int tileLeft = (newX) / 64;
-        int tileRight = (newX + p->w - 1) / 64;
-
-        if (Map[0][tileTop][tileLeft] == 1 || Map[0][tileTop][tileRight] == 1) {
+        int checkY = p->y + i * (p->h - 1);
+        if (mapManager.CheckCollisionWithMap(newX, checkY, p->w, 1)) {
             hitX = true;
             break;
         }
     }
-
     if (!hitX) p->x = newX;
     else p->vx = 0;
 
     bool hitY = false;
     p->onGround = false;
-    for (int i = 0; i < 2; i++) {
-        int checkX = (p->x + i * (p->w - 1)) / 64;
-        int checkY = (newY + (p->vy > 0 ? p->h : 0)) / 64;
-
-        if (Map[0][checkY][checkX] == 1) {
+    for (int i = 0; i <= 1; i++) {
+        int checkX = p->x + i * (p->w - 1);
+        int checkY = newY + (p->vy > 0 ? p->h : 0);
+        if (mapManager.CheckCollisionWithMap(checkX, checkY, 1, 1)) {
             hitY = true;
-
             if (p->vy > 0) {
-
-                p->y = checkY * 64 - p->h;
+                p->y = (checkY / TILE) * TILE - p->h;
                 p->onGround = true;
-            } else if (p->vy < 0) {
-
-                p->y = (checkY + 1) * 64;
+            } else {
+                p->y = ((checkY / TILE) + 1) * TILE;
             }
-
             p->vy = 0;
             break;
         }
     }
-
     if (!hitY) p->y = newY;
 
     if (p->x < 0) p->x = 0;
-    if (p->x + p->w > 1280) p->x = 1280 - p->w;
+    if (p->x + p->w > TOTAL_WIDTH) p->x = TOTAL_WIDTH - p->w;
     if (p->y < 0) p->y = 0;
-    if (p->y + p->h > 960)
-    {
-        p->y = 960 - p->h;
-        p->vy=0;
-        p->onGround=true;
+    if (p->y + p->h > TOTAL_HEIGHT) {
+        p->y = TOTAL_HEIGHT - p->h;
+        p->vy = 0;
+        p->onGround = true;
     }
 
-    for (auto& b : p->bullets) {
+    for (auto& b : p->bullets)
         if (b.active) b.update();
-    }
-
 
     p->bullets.erase(
-    remove_if(p->bullets.begin(), p->bullets.end(), [](Bullet& b) {
-        return !b.active;
-    }),
-    p->bullets.end()
-);
-
-
+        remove_if(p->bullets.begin(), p->bullets.end(), [](Bullet& b) {
+            return !b.active;
+        }),
+        p->bullets.end()
+    );
 }
 
-void RenderPlayer(Player* p) {
+
+
+
+void RenderPlayer(Player* p, int camX, int camY) {
     Uint32 currentTime = SDL_GetTicks();
     SDL_Texture* currentTexture = nullptr;
     int frameCount = 1;
@@ -225,13 +222,15 @@ void RenderPlayer(Player* p) {
         p->lastFrameTime = currentTime;
     }
 
-    SDL_Rect place = {p->x, p->y, p->w, p->h};
+    // Áp dụng camera khi render nhân vật
+    SDL_Rect place = {p->x - camX, p->y - camY, p->w, p->h};
     SDL_Rect pictureframe = {p->currentFrame * p->w, 0, p->w, p->h};
     SDL_RenderCopyEx(renderer, currentTexture, &pictureframe, &place, 0, NULL, p->flip);
 
+    // Áp dụng camera khi render đạn
     for (auto& b : p->bullets) {
         SDL_Rect src = p->bulletClips[b.frame];
-        SDL_Rect dst = { (int)b.x, (int)b.y, 64, 64 };
+        SDL_Rect dst = { (int)b.x - camX, (int)b.y - camY, 64, 64 };
 
         SDL_RenderCopy(renderer, p->bulletTexture, &src, &dst);
     }
