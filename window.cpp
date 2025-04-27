@@ -10,7 +10,7 @@ int InitWindow() {
         cout << "init error: " << SDL_GetError() << endl;
         return 0;
     }
-    window = SDL_CreateWindow("Tower Fortress", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 640, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Tower Fortress", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 760, SDL_WINDOW_SHOWN);
     if (!window)
     {
         cout << "create window error: " << SDL_GetError() << endl;
@@ -25,7 +25,7 @@ int InitWindow() {
     }
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"2"); // 0||1||2 ( độ nét tăng thì tốc độ giảm, 2 là nét nhất )
-    SDL_RenderSetLogicalSize(renderer,1280, 960); // scale kích thước cho logic ( màn hình bao nhiêu cũng scale về cái trong ngoặc )
+    SDL_RenderSetLogicalSize(renderer,1280, 960); // scale kích thước cho logic ( tính dựa trên scale chứ k phải create )
     return 1;
 }
 

@@ -6,7 +6,6 @@
 #define FALL_FRAME_COUNT 4
 #define FRAME_DELAY 70
 
-
 #include "bullet.h"
 #include <vector>
 #include <SDL2/SDL.h>
@@ -25,7 +24,7 @@ typedef enum {
 
 typedef struct {
     float x, y, w, h;
-    float vx,vy;
+    float vx, vy;
     float gravity;
     float jumpForce;
 
@@ -40,7 +39,7 @@ typedef struct {
     SDL_Texture* bulletTexture;
     SDL_Texture* dieTexture;
     SDL_Rect bulletClips[4];
-    std::vector <Bullet> bullets;
+    std::vector<Bullet> bullets;
 
     Uint32 lastFrameTime;
     Uint32 frameResetTimer;
@@ -49,17 +48,24 @@ typedef struct {
     SDL_RendererFlip flip;
 
     bool onGround;
-    bool facingRight=true;
+    bool facingRight = true;
     bool isDead;
-    bool isShooting=false;
-    bool isJumping=false;
-    bool isWinning=false;
+    bool isShooting = false;
+    bool isJumping = false;
+    bool isWinning = false;
+    bool speedBoosting;
 
+    SDL_Rect GetRect() const {
+        return SDL_Rect{(int)x, (int)y, w, h};
+    }
     PlayerAnimState currentAnim;
+
+    Uint32 speedBoostTime;
+    Uint32 jumpBoostTime;
 } Player;
 
 void InitPlayer(Player* p);
-void LoadPlayerTexture(Player* p, const char* walkPath,const char* idlePath, const char*jumpPath,const char* fallPath,const char* bulletPath,const char* diePath);
+void LoadPlayerTexture(Player* p, const char* walkPath, const char* idlePath, const char* jumpPath, const char* fallPath, const char* bulletPath, const char* diePath);
 void MovePlayer(Player* p, SDL_Event* event);
 void UpdateMove(Player* p);
 void RenderPlayer(Player* p, int camX, int camY);
@@ -67,3 +73,8 @@ void HandlePlayerDeath(Player* p, const Spike& spike, const std::vector<Bot>& bo
 bool CheckCollisionWithSpike(Spike& spike, const Player& player);
 bool CheckCollisionWithBotAttack(const Player& player, const Bot& bot);
 bool IsDeathAnimDone(const Player* p);
+void HandleBulletCollisionWithSpike(Player* p, Spike& spike);
+
+void BoostSpeed(Player& player);
+void BoostJump(Player& player);
+void Die();

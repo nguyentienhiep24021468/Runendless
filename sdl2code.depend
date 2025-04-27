@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1745618403 source:c:\users\admin\onedrive\documents\sdl2code\main.cpp
+1745737765 source:c:\users\admin\onedrive\documents\sdl2code\main.cpp
 	<iostream>
 	<SDL2/SDL.h>
 	<SDL_image.h>
@@ -12,6 +12,7 @@
 	"menu.h"
 	"bullet.h"
 	"sound.h"
+	"item.h"
 
 1738429358 c:\users\admin\downloads\sdl2-2.30.12\x86_64-w64-mingw32\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -480,7 +481,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1745617397 source:c:\users\admin\onedrive\documents\sdl2code\player.cpp
+1745737765 source:c:\users\admin\onedrive\documents\sdl2code\player.cpp
 	"player.h"
 	"window.h"
 	"map.h"
@@ -493,7 +494,7 @@
 	<algorithm>
 	<vector>
 
-1745613131 c:\users\admin\onedrive\documents\sdl2code\player.h
+1745737816 c:\users\admin\onedrive\documents\sdl2code\player.h
 	"bullet.h"
 	<vector>
 	<SDL2/SDL.h>
@@ -503,7 +504,7 @@
 	<SDL_image.h>
 	<iostream>
 
-1745614329 source:c:\users\admin\onedrive\documents\sdl2code\window.cpp
+1745738013 source:c:\users\admin\onedrive\documents\sdl2code\window.cpp
 	"window.h"
 	<iostream>
 
@@ -518,7 +519,7 @@
 	<SDL_image.h>
 	<vector>
 
-1745614329 source:c:\users\admin\onedrive\documents\sdl2code\menu.cpp
+1745737765 source:c:\users\admin\onedrive\documents\sdl2code\menu.cpp
 	"menu.h"
 	<iostream>
 
@@ -526,28 +527,29 @@
 	"bullet.h"
 	<cmath>
 
-1745592758 c:\users\admin\onedrive\documents\sdl2code\bullet.h
+1745689718 c:\users\admin\onedrive\documents\sdl2code\bullet.h
 	<SDL2/SDL.h>
 	<vector>
 
-1745629982 source:c:\users\admin\onedrive\documents\sdl2code\bot.cpp
+1745711354 source:c:\users\admin\onedrive\documents\sdl2code\bot.cpp
 	"bot.h"
 	"map.h"
 	"spike.h"
 	"sound.h"
+	"item.h"
 	<cmath>
 	<vector>
 
-1745629982 c:\users\admin\onedrive\documents\sdl2code\bot.h
+1745710323 c:\users\admin\onedrive\documents\sdl2code\bot.h
 	"map.h"
 	"bullet.h"
 	<vector>
 
-1745549550 source:c:\users\admin\onedrive\documents\sdl2code\spike.cpp
+1745694206 source:c:\users\admin\onedrive\documents\sdl2code\spike.cpp
 	"spike.h"
 	"map.h"
 
-1745616764 c:\users\admin\onedrive\documents\sdl2code\spike.h
+1745736686 c:\users\admin\onedrive\documents\sdl2code\spike.h
 	"player.h"
 	<SDL.h>
 
@@ -563,4 +565,19 @@
 1745614328 source:c:\users\admin\onedrive\documents\sdl2code\sound.cpp
 	"sound.h"
 	<iostream>
+
+1745737127 source:c:\users\admin\onedrive\documents\sdl2code\item.cpp
+	"item.h"
+	"player.h"
+	"map.h"
+	<SDL_image.h>
+	<cstdlib>
+	<iostream>
+
+1745738412 c:\users\admin\onedrive\documents\sdl2code\item.h
+	"player.h"
+	<SDL.h>
+	<vector>
+	<cstdlib>
+	<ctime>
 

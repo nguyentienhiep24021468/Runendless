@@ -11,8 +11,10 @@ public:
     float GetX() const { return x_pos; }
     SDL_Rect GetRect() const {
     return { (int)x_pos, 0, frameWidth, frameHeight };
-}
+    }
 
+    void GetSlowed();
+    bool is_slowed=false;
 private:
     float x_pos;
     float speed = 150.0f;
@@ -25,6 +27,9 @@ private:
 
     SDL_Texture* texture = nullptr;
     SDL_Rect srcRect, destRect;
+    float current_speed= 150.0f;
+    Uint32 slow_timer;
+
 
 };
 extern Spike spike;

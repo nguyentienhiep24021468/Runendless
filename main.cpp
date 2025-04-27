@@ -11,11 +11,14 @@
 #include "menu.h"
 #include "bullet.h"
 #include "sound.h"
+#include "item.h"
 
 using namespace std;
 
 int SDL_main(int argc, char* argv[])
 {
+    srand(time(nullptr));
+
     SDL_Init(SDL_INIT_EVERYTHING);
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
     if (!InitWindow()) {
@@ -26,15 +29,15 @@ int SDL_main(int argc, char* argv[])
     SoundManager soundManager;
 
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-        cout << "SDL_Init(SDL_INIT_AUDIO) failed: " << SDL_GetError() << endl;
+        cout << "error sound: "<<SDL_GetError() << endl;
         exit(1);
     }
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        cout << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << endl;
+        cout << "error sound: " << Mix_GetError() << endl;
         exit(1);
     }
     if (!soundManager.LoadSounds()) {
-        cout << "Sound load failed!" << endl;
+        cout << "error loadsound: " << endl;
         exit(1);
     }
     soundManager.PlayBackgroundMusic();
@@ -43,7 +46,7 @@ int SDL_main(int argc, char* argv[])
     Player player;
     InitPlayer(&player);
     LoadPlayerTexture(&player, "picture/sheetwalk.png", "picture/sheetidle.png", "picture/sheetjump.png", "picture/sheetfall.png", "picture/sheetbulletbig.png", "picture/sheetdie.png");
-
+    LoadItemTextures(renderer);
     MapManager map;
     map.InitTestMap();
     if (!map.LoadTileset(renderer, "picture/sheetmap.png")) {
@@ -56,9 +59,7 @@ int SDL_main(int argc, char* argv[])
     Spike spike;
     SDL_Texture* spikeTex = IMG_LoadTexture(renderer, "picture/sheetlog.png");
 
-    bool run = true;
-    bool started = false;
-    bool soundPlayed=false;
+    bool run = true, started = false, soundPlayed = false;
     SDL_Event event;
 
     Menu menu(renderer);
@@ -66,7 +67,6 @@ int SDL_main(int argc, char* argv[])
     soundManager.StopMusic();
 
     int checkmoveforspike = 0;
-
     while (run)
     {
         Uint32 lastTick;
@@ -95,20 +95,22 @@ int SDL_main(int argc, char* argv[])
         UpdateMove(&player);
 
         HandlePlayerDeath(&player, spike, botList);
+        HandleItemCollection(player);
         if ((player.isDead && IsDeathAnimDone(&player)) || player.isWinning)
         {
+            ClearItemsOnPlayerDeath(player);
             soundManager.StopMusic();
             if (player.isDead)  soundManager.PlayMusic(GAMEOVER);
             if (player.isWinning)
             {
                 soundManager.PlayMusic(VICTORY);
-                player.isWinning=false;
+                player.isWinning = false;
             }
 
             checkmoveforspike = 0;
             started = false;
             isRunning = false;
-            soundPlayed=false;
+            soundPlayed = false;
             int result = menu.ShowGameOverMenu();
 
             if (result == 1 || result == 2) {
@@ -120,7 +122,7 @@ int SDL_main(int argc, char* argv[])
                 player.y = 576;
 
                 LoadPlayerTexture(&player, "picture/sheetwalk.png", "picture/sheetidle.png", "picture/sheetjump.png", "picture/sheetfall.png", "picture/sheetbulletbig.png", "picture/sheetdie.png");
-
+                LoadItemTextures(renderer);
                 spike.Init(spikeTex, 960);
                 botList.clear();
                 InitAllBots(renderer);
@@ -147,6 +149,8 @@ int SDL_main(int argc, char* argv[])
 
         if (checkmoveforspike > 0)  spike.Update(deltaTime, player.x, 1064);
 
+        HandleItemCollection(player);
+
         SDL_RenderClear(renderer);
         map.Draw(renderer, 1280, 960);
         spike.Render(renderer, map.camX);
@@ -158,7 +162,10 @@ int SDL_main(int argc, char* argv[])
             bot.Render(renderer, map.camX, map.camY);
         }
 
+        for (auto& item : itemList)   item.Render(renderer, map.camX);
+
         RenderPlayer(&player, map.camX, map.camY);
+        HandleBulletCollisionWithSpike(&player, spike);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);

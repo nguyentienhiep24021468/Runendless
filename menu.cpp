@@ -5,14 +5,10 @@ using namespace std;
 Menu::Menu(SDL_Renderer* renderer) {
     gRenderer = renderer;
     startBackground = LoadTexture("picture/menu.png");
-    if (!startBackground) {
-        cout << "Không thể load menu.png\n";
-    }
+    if (!startBackground)   cout << "error menu.png";
 
     overBackground = LoadTexture("picture/menudie.png");
-    if (!overBackground) {
-        cout << "Không thể load menudie.png\n";
-    }
+    if (!overBackground)    cout << "error menudie.png";
 }
 
 Menu::~Menu() {
@@ -23,16 +19,14 @@ Menu::~Menu() {
 SDL_Texture* Menu::LoadTexture(const string& path) {
     SDL_Surface* surface = IMG_Load(path.c_str());
     if (!surface) {
-        cout << "Lỗi khi load ảnh " << path << ": " << IMG_GetError() << endl;
+        cout << "error load picture: "<< IMG_GetError() << endl;
         return nullptr;
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, surface);
     SDL_FreeSurface(surface);
 
-    if (!texture) {
-        cout << "Lỗi khi tạo texture từ ảnh " << path << ": " << SDL_GetError() << endl;
-    }
+    if (!texture)   cout << "error load picture: "<< SDL_GetError() << endl;
 
     return texture;
 }
@@ -51,9 +45,7 @@ bool Menu::ShowStartMenu() {
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int x = e.button.x;
                 int y = e.button.y;
-                if (IsInside(x, y, playRect)) {
-                    return true;
-                }
+                if (IsInside(x, y, playRect)) return true;
             }
         }
 
@@ -79,6 +71,7 @@ int Menu::ShowGameOverMenu() {
                 if (IsInside(x, y, menuRect)) return 2;
             }
         }
+
         SDL_RenderClear(gRenderer);
         SDL_RenderCopy(gRenderer, overBackground, NULL, NULL);
         SDL_RenderPresent(gRenderer);

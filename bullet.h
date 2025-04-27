@@ -11,4 +11,8 @@ struct Bullet {
 
     void update();
     void render(SDL_Renderer* renderer, SDL_Texture* bulletTexture, SDL_Rect bulletClips[]);
+
+    SDL_Rect getRect() const {
+    return SDL_Rect{ (int)x, (int)y, 48, 48 };
+    }
 };

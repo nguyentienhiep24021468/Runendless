@@ -52,6 +52,8 @@
 		<Unit filename="bot.h" />
 		<Unit filename="bullet.cpp" />
 		<Unit filename="bullet.h" />
+		<Unit filename="item.cpp" />
+		<Unit filename="item.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="map.cpp" />
 		<Unit filename="map.h" />

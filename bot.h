@@ -17,7 +17,7 @@ struct Bot {
 
     bool facingLeft;
     bool isDead;
-
+    bool spawnedItem;
     int state;
     int frame, frameTimer, frameDelay;
 

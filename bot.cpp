@@ -2,6 +2,7 @@
 #include "map.h"
 #include "spike.h"
 #include "sound.h"
+#include "item.h"
 #include <cmath>
 #include <vector>
 
@@ -15,21 +16,27 @@ void Bot::Init(int spawnX, int spawnY, SDL_Renderer* renderer) {
     y = spawnY;
     facingLeft = false;
     isDead = false;
+        spawnedItem = false;
     state = BOT_WALK;
     frame = 0;
     frameTimer = 0;
     frameDelay = 10;
 
-    patrolLeftPx  = spawnX  - TILE_SIZE * 5;
-    patrolRightPx = spawnX  + TILE_SIZE * 5;
+    patrolLeftPx = spawnX - TILE_SIZE * 5;
+    patrolRightPx = spawnX + TILE_SIZE * 5;
 
-    walkTexture   = IMG_LoadTexture(renderer, "picture/botwalk.png");
+    walkTexture = IMG_LoadTexture(renderer, "picture/botwalk.png");
     attackTexture = IMG_LoadTexture(renderer, "picture/botattack.png");
-    dieTexture    = IMG_LoadTexture(renderer, "picture/botdeath.png");
+    dieTexture = IMG_LoadTexture(renderer, "picture/botdeath.png");
 }
 
 void Bot::Update(float playerX, float playerY) {
     if (isDead) {
+        if (!spawnedItem) {
+            SpawnItem(x+32, y+32);
+            spawnedItem = true;
+        }
+
         state = BOT_DIE;
         if (++frameTimer >= frameDelay) {
             frameTimer = 0;
@@ -61,11 +68,11 @@ void Bot::Update(float playerX, float playerY) {
         return;
     }
 
-    state = state == BOT_ATTACK ? BOT_ATTACK : BOT_WALK;
+    state = BOT_WALK;
     bool inChaseRange = fabs(dx) < TILE_SIZE * 6 && dy < TILE_SIZE * 2;
 
     float patrolSpeed = 1.5f;
-    float chaseSpeed  = 2.5f;
+    float chaseSpeed = 2.5f;
     float speed;
     float nextX;
 
@@ -75,17 +82,14 @@ void Bot::Update(float playerX, float playerY) {
         facingLeft = dx < 0;
         speed = chaseSpeed;
         nextX = x + (facingLeft ? -speed : speed);
-
     } else if (x < patrolLeftPx || x > patrolRightPx) {
         facingLeft = x > homeX;
         speed = patrolSpeed;
-
         if (x < homeX) {
             nextX = x + speed;
         } else {
             nextX = x - speed;
         }
-
     } else {
         speed = patrolSpeed;
         nextX = x + (facingLeft ? -speed : speed);
@@ -129,8 +133,8 @@ void Bot::Render(SDL_Renderer* renderer, int camX, int camY) {
            : state == BOT_ATTACK ? attackTexture
            : dieTexture);
 
-    SDL_Rect src  = { frame * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
-    SDL_Rect dst  = { int(x) - camX, int(y) - camY, TILE_SIZE, TILE_SIZE };
+    SDL_Rect src = { frame * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
+    SDL_Rect dst = { int(x) - camX, int(y) - camY, TILE_SIZE, TILE_SIZE };
     SDL_RendererFlip flip = facingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
     SDL_RenderCopyEx(renderer, tex, &src, &dst, 0, nullptr, flip);
 }
@@ -155,6 +159,7 @@ void InitAllBots(SDL_Renderer* renderer) {
 
 void Bot::CheckBotDie(const Spike& spike, vector<Bullet>& bullets) {
     if (isDead) return;
+
     if (spike.GetX() >= x - 150) {
         isDead = true;
         state = BOT_DIE;
@@ -168,7 +173,7 @@ void Bot::CheckBotDie(const Spike& spike, vector<Bullet>& bullets) {
         if (!b.active) continue;
         SDL_Rect bulletRect = { int(b.x), int(b.y), 32, 32 };
         SDL_Rect reducedBotRect = { int(x) + 10, int(y) + 10, TILE_SIZE - 30, TILE_SIZE - 30 };
-        SDL_Rect reducedBulletRect = { int(b.x) + 5, int(b.y) + 5, 32 - 10, 32 - 10 };
+        SDL_Rect reducedBulletRect = { int(b.x) + 5, int(b.y) + 5, 22, 22 };
         if (SDL_HasIntersection(&reducedBotRect, &reducedBulletRect)) {
             isDead = true;
             state = BOT_DIE;

@@ -19,19 +19,29 @@ void InitPlayer(Player* p) {
     p->h = 64;
     p->vx = 0;
     p->vy = 0;
-    p->walkTexture = 0;
-    p->idleTexture = 0;
+    p->walkTexture = nullptr;
+    p->idleTexture = nullptr;
+    p->jumpTexture = nullptr;
+    p->fallTexture = nullptr;
+    p->bulletTexture = nullptr;
+    p->dieTexture = nullptr;
     p->currentFrame = 0;
     p->lastFrameTime = 0;
     p->onGround = false;
     p->gravity = 0.5f;
-    p->jumpForce = -15.0f;
+    p->jumpForce = -16.0f;
     p->isMoving = 0;
-    p->lastShotTime = 0;
     p->flip = SDL_FLIP_NONE;
+    p->lastShotTime = 0;
+    p->speedBoosting = false;
+    p->speedBoostTime = 0;
+    p->jumpBoostTime = 0;
+    p->facingRight = true;
     p->isDead = false;
     p->dieFrame = 0;
-    p->dieTexture = nullptr;
+    p->isWinning = false;
+    p->isShooting = false;
+    p->currentAnim = IDLE;
 }
 
 void LoadPlayerTexture(Player* p, const char* walkPath, const char* idlePath, const char* jumpPath, const char* fallPath, const char* bulletPath, const char* diePath) {
@@ -50,7 +60,6 @@ void LoadPlayerTexture(Player* p, const char* walkPath, const char* idlePath, co
         p->jumpTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
         SDL_FreeSurface(tempSurface);
     }
-
     tempSurface = IMG_Load(fallPath);
     if (tempSurface) {
         p->fallTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
@@ -59,7 +68,7 @@ void LoadPlayerTexture(Player* p, const char* walkPath, const char* idlePath, co
     tempSurface = IMG_Load(bulletPath);
     if (tempSurface) {
         p->bulletTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
-        for (int i = 0; i < 4; i++) p->bulletClips[i] = {i * 64, 0, 64, 64};
+        for (int i = 0; i < 4; ++i) p->bulletClips[i] = { i * 64, 0, 64, 64 };
         SDL_FreeSurface(tempSurface);
     }
     tempSurface = IMG_Load(diePath);
@@ -71,18 +80,19 @@ void LoadPlayerTexture(Player* p, const char* walkPath, const char* idlePath, co
 
 void MovePlayer(Player* p, SDL_Event* event) {
     if (p->isDead) return;
+    bool isMoving = false;
 
     if (event->type == SDL_KEYDOWN) {
         switch (event->key.keysym.sym) {
             case SDLK_a:
-                p->vx = -4;
-                p->isMoving = 1;
+                p->vx = (p->speedBoosting ? -8.0f : -4.0f);
+                isMoving = true;
                 p->flip = SDL_FLIP_HORIZONTAL;
                 p->facingRight = false;
                 break;
             case SDLK_d:
-                p->vx = +4;
-                p->isMoving = 1;
+                p->vx = (p->speedBoosting ? 8.0f : 4.0f);
+                isMoving = true;
                 p->flip = SDL_FLIP_NONE;
                 p->facingRight = true;
                 break;
@@ -90,24 +100,16 @@ void MovePlayer(Player* p, SDL_Event* event) {
                 if (p->onGround) {
                     p->vy = p->jumpForce;
                     p->onGround = false;
-                    p->isJumping = true;
                 }
                 break;
             case SDLK_j:
                 Uint32 currentTime = SDL_GetTicks();
-                Bullet b;
                 if (currentTime - p->lastShotTime >= 500) {
-                    if (p->facingRight) {
-                        b.x = p->x + 48;
-                        b.y = p->y + 16;
-                        b.vx = 13.0f;
-                        p->bullets.push_back(b);
-                    } else {
-                        b.x = p->x - 48;
-                        b.y = p->y + 16;
-                        b.vx = -13.0f;
-                        p->bullets.push_back(b);
-                    }
+                    Bullet b;
+                    b.x = p->facingRight ? p->x + 48 : p->x - 48;
+                    b.y = p->y + 16;
+                    b.vx = p->facingRight ? 13.0f : -13.0f;
+                    p->bullets.push_back(b);
                     p->isShooting = true;
                     p->lastShotTime = currentTime;
                 }
@@ -119,10 +121,10 @@ void MovePlayer(Player* p, SDL_Event* event) {
             case SDLK_a:
             case SDLK_d:
                 p->vx = 0;
-                p->isMoving = 0;
                 break;
         }
     }
+    p->isMoving = (p->vx != 0);
 }
 
 void UpdateMove(Player* p) {
@@ -137,6 +139,9 @@ void UpdateMove(Player* p) {
         return;
     }
 
+    if (SDL_GetTicks() - p->speedBoostTime > 5000) p->speedBoosting = false;
+    if (SDL_GetTicks() - p->jumpBoostTime > 5000) p->jumpForce = -16.0f;
+
     p->vy += p->gravity;
     if (p->vy > 8) p->vy = 8;
 
@@ -144,7 +149,7 @@ void UpdateMove(Player* p) {
     float newY = p->y + p->vy;
 
     bool hitX = false;
-    for (int i = 0; i <= 1; i++) {
+    for (int i = 0; i <= 1; ++i) {
         int checkY = p->y + i * (p->h - 1);
         if (mapManager.CheckCollisionWithMap(newX, checkY, p->w, 1)) {
             hitX = true;
@@ -155,7 +160,7 @@ void UpdateMove(Player* p) {
 
     bool hitY = false;
     p->onGround = false;
-    for (int i = 0; i <= 1; i++) {
+    for (int i = 0; i <= 1; ++i) {
         int checkX = p->x + i * (p->w - 1);
         int checkY = newY + (p->vy > 0 ? p->h : 0);
         if (mapManager.CheckCollisionWithMap(checkX, checkY, 1, 1)) {
@@ -171,18 +176,18 @@ void UpdateMove(Player* p) {
         }
     }
     if (!hitY) p->y = newY;
+
     if (p->x < 0) p->x = 0;
     if (p->x + p->w > TOTAL_WIDTH) p->x = TOTAL_WIDTH - p->w;
     if (p->y < 0) p->y = 0;
+    if (p->y > 910) p->isDead = true;
     if (p->x >= TOTAL_WIDTH - p->w) p->isWinning = true;
 
     for (auto& b : p->bullets)
         if (b.active) b.update();
 
     p->bullets.erase(
-        remove_if(p->bullets.begin(), p->bullets.end(), [](Bullet& b) {
-            return !b.active;
-        }),
+        remove_if(p->bullets.begin(), p->bullets.end(), [](Bullet& b) { return !b.active; }),
         p->bullets.end()
     );
 }
@@ -192,13 +197,12 @@ void RenderPlayer(Player* p, int camX, int camY) {
     SDL_Texture* currentTexture = nullptr;
     int frameCount = 1;
     PlayerAnimState newAnim;
+
     if (p->isDead) {
-        p->vx = 0;
-        p->vy = 0;
         if (p->dieFrame < 24) {
-            SDL_Rect dieClip = {p->dieFrame * 64, 0, 64, 64};
-            SDL_Rect renderQuad = {(int)p->x - camX, (int)p->y - camY, 64, 64};
-            SDL_RenderCopyEx(renderer, p->dieTexture, &dieClip, &renderQuad, 0, NULL, p->flip);
+            SDL_Rect clip = { p->dieFrame * 64, 0, 64, 64 };
+            SDL_Rect renderQuad = { (int)p->x - camX, (int)p->y - camY, 64, 64 };
+            SDL_RenderCopyEx(renderer, p->dieTexture, &clip, &renderQuad, 0, NULL, p->flip);
             if (currentTime > p->lastFrameTime + FRAME_DELAY) {
                 p->dieFrame++;
                 p->lastFrameTime = currentTime;
@@ -239,13 +243,13 @@ void RenderPlayer(Player* p, int camX, int camY) {
         p->lastFrameTime = currentTime;
     }
 
-    SDL_Rect place = {p->x - camX, p->y - camY, p->w, p->h};
-    SDL_Rect pictureframe = {p->currentFrame * p->w, 0, p->w, p->h};
+    SDL_Rect place = { (int)p->x - camX, (int)p->y - camY, p->w, p->h };
+    SDL_Rect pictureframe = { p->currentFrame * p->w, 0, p->w, p->h };
     SDL_RenderCopyEx(renderer, currentTexture, &pictureframe, &place, 0, NULL, p->flip);
 
     for (auto& b : p->bullets) {
         SDL_Rect src = p->bulletClips[b.frame];
-        SDL_Rect dst = {(int)b.x - camX, (int)b.y - camY, 64, 64};
+        SDL_Rect dst = { (int)b.x - camX, (int)b.y - camY, 64, 64 };
         SDL_RenderCopy(renderer, p->bulletTexture, &src, &dst);
     }
 }
@@ -253,14 +257,14 @@ void RenderPlayer(Player* p, int camX, int camY) {
 bool CheckCollisionWithBotAttack(const Player& player, const Bot& bot) {
     if (!bot.IsAttacking()) return false;
 
-    SDL_Rect playerRect = {(int)player.x, (int)player.y, (int)player.w, (int)player.h};
-    SDL_Rect botRect = {(int)bot.x, (int)bot.y, 64, 64};
+    SDL_Rect playerRect = { (int)player.x, (int)player.y, (int)player.w, (int)player.h };
+    SDL_Rect botRect = { (int)bot.x, (int)bot.y, 64, 64 };
 
     return SDL_HasIntersection(&playerRect, &botRect);
 }
 
 bool CheckCollisionWithSpike(const Spike& spike, const Player& p) {
-    SDL_Rect playerRect = {(int)p.x, (int)p.y, (int)p.w - 32, (int)p.h - 32};
+    SDL_Rect playerRect = { (int)p.x, (int)p.y, (int)p.w - 32, (int)p.h - 32 };
     SDL_Rect spikeRect = spike.GetRect();
     return SDL_HasIntersection(&playerRect, &spikeRect);
 }
@@ -271,7 +275,6 @@ void HandlePlayerDeath(Player* p, const Spike& spike, const vector<Bot>& botList
     if (CheckCollisionWithSpike(spike, *p)) {
         p->isDead = true;
         p->dieFrame = 0;
-        p->vy = 0;
         return;
     }
 
@@ -279,18 +282,39 @@ void HandlePlayerDeath(Player* p, const Spike& spike, const vector<Bot>& botList
         if (CheckCollisionWithBotAttack(*p, bot)) {
             p->isDead = true;
             p->dieFrame = 0;
-            p->vy = 0;
             return;
         }
-    }
-
-    if (p->y > 910) {
-        p->isDead = true;
-        p->onGround = true;
-        p->vy = 0;
     }
 }
 
 bool IsDeathAnimDone(const Player* p) {
     return p->isDead && p->dieFrame >= 24;
+}
+
+void HandleBulletCollisionWithSpike(Player* p, Spike& spike) {
+    for (auto& b : p->bullets) {
+        if (!b.active) continue;
+
+        SDL_Rect bulletRect = { (int)b.x + 64, (int)b.y, 64, 64 };
+        SDL_Rect spikeRect = spike.GetRect();
+
+        if (SDL_HasIntersection(&bulletRect, &spikeRect)) {
+            b.active = false;
+            spike.GetSlowed();
+        }
+    }
+}
+
+void Die(Player* p) {
+    p->isDead = true;
+}
+
+void BoostSpeed(Player& p) {
+    p.speedBoostTime = SDL_GetTicks();
+    p.speedBoosting = true;
+}
+
+void BoostJump(Player& p) {
+    p.jumpBoostTime = SDL_GetTicks();
+    p.jumpForce = -21.0f;
 }
