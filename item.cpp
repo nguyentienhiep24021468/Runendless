@@ -19,7 +19,6 @@ Item::Item(float x, float y, ItemType type) {
     this->y_pos = y;
     this->type = type;
 
-    // Gán texture tương ứng
     switch (type) {
         case ITEM_SPEED:
             texture = speedTexture;
@@ -91,7 +90,7 @@ void HandleItemCollection(Player& player) {
 
     for (auto& item : itemList) {
         if (!item.isCollected && item.CheckCollision(playerRect)) {  
-            item.isCollected = true;  // Đánh dấu item đã được nhặt
+            item.isCollected = true;
 
             switch (item.GetType()) {
                 case ITEM_SPEED:
@@ -111,7 +110,6 @@ void HandleItemCollection(Player& player) {
 }
 
 void GameLoop(Player& player, SDL_Renderer* renderer, float deltaTime) {
-    // Kiểm tra va chạm vật phẩm
     HandleItemCollection(player); 
     for (auto& item : itemList) {
         item.Render(renderer, map.camX);
