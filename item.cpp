@@ -51,10 +51,6 @@ bool Item::CheckCollision(const SDL_Rect& playerRect) {
     return SDL_HasIntersection(&playerRect, &itemRect);
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 74f5431ca5e02f11f92582faa651aa109f01d394
 void SpawnItem(float x, float y) {
     int random = rand() % 3; // 0, 1, 2
     ItemType type = ITEM_NONE;
@@ -66,10 +62,6 @@ void SpawnItem(float x, float y) {
     itemList.push_back(Item(x, y, type));
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 74f5431ca5e02f11f92582faa651aa109f01d394
 void LoadItemTextures(SDL_Renderer* renderer) {
     speedTexture = IMG_LoadTexture(renderer, "picture/speed.png");
     jumpTexture = IMG_LoadTexture(renderer, "picture/jump.png");
@@ -80,42 +72,26 @@ void LoadItemTextures(SDL_Renderer* renderer) {
     }
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 74f5431ca5e02f11f92582faa651aa109f01d394
 void FreeItemTextures() {
     if (speedTexture) SDL_DestroyTexture(speedTexture);
     if (jumpTexture) SDL_DestroyTexture(jumpTexture);
     if (deadTexture) SDL_DestroyTexture(deadTexture);
 }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 74f5431ca5e02f11f92582faa651aa109f01d394
 void HandleItemCollection(Player& player) {
     SDL_Rect playerRect = player.GetRect();
 
     for (auto& item : itemList) {
-<<<<<<< HEAD
         if (!item.isCollected && item.CheckCollision(playerRect)) {
             item.isCollected = true;
-=======
-        if (!item.isCollected && item.CheckCollision(playerRect)) {  
-            item.isCollected = true;
 
->>>>>>> 74f5431ca5e02f11f92582faa651aa109f01d394
             switch (item.GetType()) {
                 case ITEM_SPEED:
                     BoostSpeed(player);
                     break;
                 case ITEM_JUMP:
-<<<<<<< HEAD
                     BoostJump(player);
-=======
-                    BoostJump(player);  
->>>>>>> 74f5431ca5e02f11f92582faa651aa109f01d394
                     break;
                 case ITEM_DEAD:
                     player.isDead = true;
@@ -127,12 +103,10 @@ void HandleItemCollection(Player& player) {
     }
 }
 
+
 void GameLoop(Player& player, SDL_Renderer* renderer, float deltaTime) {
-<<<<<<< HEAD
     HandleItemCollection(player);
-=======
-    HandleItemCollection(player); 
->>>>>>> 74f5431ca5e02f11f92582faa651aa109f01d394
+    HandleItemCollection(player);
     for (auto& item : itemList) {
         item.Render(renderer, map.camX);
     }
