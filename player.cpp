@@ -166,10 +166,10 @@ void UpdateMove(Player* p) {
         if (mapManager.CheckCollisionWithMap(checkX, checkY, 1, 1)) {
             hitY = true;
             if (p->vy > 0) {
-                p->y = (checkY / TILE) * TILE - p->h;
+                p->y = ((checkY/TILE)-1)*TILE;
                 p->onGround = true;
             } else {
-                p->y = ((checkY / TILE) + 1) * TILE;
+                p->y = ((checkY / TILE)+ 1)*TILE;
             }
             p->vy = 0;
             break;
@@ -177,19 +177,13 @@ void UpdateMove(Player* p) {
     }
     if (!hitY) p->y = newY;
 
-    if (p->x < 0) p->x = 0;
-    if (p->x + p->w > TOTAL_WIDTH) p->x = TOTAL_WIDTH - p->w;
-    if (p->y < 0) p->y = 0;
     if (p->y > 910) p->isDead = true;
     if (p->x >= TOTAL_WIDTH - p->w) p->isWinning = true;
 
     for (auto& b : p->bullets)
         if (b.active) b.update();
 
-    p->bullets.erase(
-        remove_if(p->bullets.begin(), p->bullets.end(), [](Bullet& b) { return !b.active; }),
-        p->bullets.end()
-    );
+    p->bullets.erase(remove_if(p->bullets.begin(), p->bullets.end(), [](Bullet& b) { return !b.active; }),p->bullets.end());
 }
 
 void RenderPlayer(Player* p, int camX, int camY) {

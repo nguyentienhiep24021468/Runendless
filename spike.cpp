@@ -14,9 +14,7 @@ void Spike::Update(float deltaTime, float playerX, int screen_width) {
     float targetSpeed = current_speed;
 
 
-    if (x_pos < playerX - screen_width + frameWidth + 50) {
-        targetSpeed = current_speed * 2.5f;
-    }
+    if (x_pos < playerX - screen_width + frameWidth + 50)   targetSpeed = current_speed * 2.5f;
 
     x_pos += targetSpeed * deltaTime;
 
@@ -27,8 +25,7 @@ void Spike::Update(float deltaTime, float playerX, int screen_width) {
         srcRect.x = currentFrame * frameWidth;
     }
 
-    if (x_pos >= TOTAL_MAP_WIDTH * TILE_SIZE - 8 * TILE_SIZE)
-        x_pos = TOTAL_MAP_WIDTH * TILE_SIZE - 8 * TILE_SIZE;
+    if (x_pos >= TOTAL_MAP_WIDTH * TILE_SIZE - 8 * TILE_SIZE)   x_pos = TOTAL_MAP_WIDTH * TILE_SIZE - 8 * TILE_SIZE;
     if (is_slowed)
     {
         if (SDL_GetTicks() - slow_timer >= 3000)

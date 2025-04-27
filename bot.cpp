@@ -16,7 +16,7 @@ void Bot::Init(int spawnX, int spawnY, SDL_Renderer* renderer) {
     y = spawnY;
     facingLeft = false;
     isDead = false;
-        spawnedItem = false;
+    spawnedItem = false;
     state = BOT_WALK;
     frame = 0;
     frameTimer = 0;
@@ -55,16 +55,10 @@ void Bot::Update(float playerX, float playerY) {
     if (state == BOT_ATTACK) {
         if (++frameTimer >= frameDelay) {
             frameTimer = 0;
-            if (frame < 5) {
-                frame++;
-            } else {
-                frame = 0;
-            }
+            if (frame < 5) frame++;
+            else frame = 0;
         }
-
-        if (fabs(dx) > TILE_SIZE * 2 || dy > TILE_SIZE * 2) {
-            state = BOT_WALK;
-        }
+        if (fabs(dx) > TILE_SIZE * 2 || dy > TILE_SIZE * 2) state = BOT_WALK;
         return;
     }
 
@@ -106,9 +100,8 @@ void Bot::Update(float playerX, float playerY) {
         if (!inChaseRange && (x >= patrolLeftPx && x <= patrolRightPx)) {
             facingLeft = !facingLeft;
             nextX = x + (facingLeft ? -speed : speed);
-        } else {
-            nextX = x;
         }
+        else nextX = x;
     }
 
     if (!inChaseRange && (nextX < patrolLeftPx || nextX > patrolRightPx)) {
@@ -121,17 +114,18 @@ void Bot::Update(float playerX, float playerY) {
     if (state != BOT_ATTACK) {
         if (++frameTimer >= frameDelay) {
             frameTimer = 0;
-            frame = (frame + 1) % 4;
+            frame = (frame + 1) % 6;
         }
     }
 }
 
 void Bot::Render(SDL_Renderer* renderer, int camX, int camY) {
-    SDL_Texture* tex = isDead
-        ? dieTexture
-        : (state == BOT_WALK ? walkTexture
-           : state == BOT_ATTACK ? attackTexture
-           : dieTexture);
+    SDL_Texture* tex;
+    if (isDead) tex = dieTexture;
+    else {
+        if (state == BOT_WALK)   tex = walkTexture;
+        else   tex = attackTexture;
+    }
 
     SDL_Rect src = { frame * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE };
     SDL_Rect dst = { int(x) - camX, int(y) - camY, TILE_SIZE, TILE_SIZE };

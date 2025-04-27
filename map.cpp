@@ -170,7 +170,7 @@ int Got[MAP_COUNT][MAP_HEIGHT][MAP_WIDTH]=
 
 };
 
-int Map[15][180]={};
+
 
 
 MapManager mapManager;
@@ -186,6 +186,7 @@ bool MapManager::LoadTileset(SDL_Renderer* renderer, const char* filePath) {
     return tileTexture != nullptr;
 }
 
+int Map[15][180]={};
 void MapManager::InitTestMap() {
     for (int k = 0; k < MAP_COUNT; ++k) {
         for (int i = 0; i < MAP_HEIGHT; ++i) {
@@ -231,10 +232,7 @@ bool MapManager::CheckCollisionWithMap(int x, int y, int w, int h) {
     int bottomTile = (y + h - 1) / TILE;
 
     for (int ty = topTile; ty <= bottomTile; ty++) {
-        if (ty < 0 || ty >= MAP_HEIGHT) continue;
         for (int tx = leftTile; tx <= rightTile; tx++) {
-            if (tx < 0 || tx >= 180) continue;
-
             if (Map[ty][tx] == 1)
                 return true;
         }

@@ -16,8 +16,6 @@ private:
     SDL_Renderer* gRenderer;
     SDL_Texture* startBackground;
     SDL_Texture* overBackground;
-
-
     SDL_Texture* LoadTexture(const string& path);
     bool IsInside(int x, int y, SDL_Rect rect);
 };

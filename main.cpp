@@ -20,7 +20,7 @@ int SDL_main(int argc, char* argv[])
     srand(time(nullptr));
 
     SDL_Init(SDL_INIT_EVERYTHING);
-    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+    IMG_Init(IMG_INIT_PNG);
     if (!InitWindow()) {
         cout << "error window: " << SDL_GetError() << endl;
         return -1;
@@ -58,13 +58,13 @@ int SDL_main(int argc, char* argv[])
     InitAllBots(renderer);
     Spike spike;
     SDL_Texture* spikeTex = IMG_LoadTexture(renderer, "picture/sheetlog.png");
+    Menu menu(renderer);
+
+    if (!menu.ShowStartMenu()) return 0;
+    soundManager.StopMusic();
 
     bool run = true, started = false, soundPlayed = false;
     SDL_Event event;
-
-    Menu menu(renderer);
-    if (!menu.ShowStartMenu()) return 0;
-    soundManager.StopMusic();
 
     int checkmoveforspike = 0;
     while (run)
@@ -96,6 +96,7 @@ int SDL_main(int argc, char* argv[])
 
         HandlePlayerDeath(&player, spike, botList);
         HandleItemCollection(player);
+        HandleBulletCollisionWithSpike(&player, spike);
         if ((player.isDead && IsDeathAnimDone(&player)) || player.isWinning)
         {
             ClearItemsOnPlayerDeath(player);
@@ -118,9 +119,6 @@ int SDL_main(int argc, char* argv[])
 
                 soundManager.StopMusic();
                 InitPlayer(&player);
-                player.x = 144;
-                player.y = 576;
-
                 LoadPlayerTexture(&player, "picture/sheetwalk.png", "picture/sheetidle.png", "picture/sheetjump.png", "picture/sheetfall.png", "picture/sheetbulletbig.png", "picture/sheetdie.png");
                 LoadItemTextures(renderer);
                 spike.Init(spikeTex, 960);
@@ -133,9 +131,7 @@ int SDL_main(int argc, char* argv[])
 
                 if (result == 2) {
                     soundManager.PlayBackgroundMusic();
-                    if (!menu.ShowStartMenu()) {
-                        run = false;
-                    }
+                    if (!menu.ShowStartMenu())    run = false;
                     soundManager.StopMusic();
                 }
 
@@ -148,8 +144,6 @@ int SDL_main(int argc, char* argv[])
         if (player.x != 144 || player.y != 576) checkmoveforspike++;
 
         if (checkmoveforspike > 0)  spike.Update(deltaTime, player.x, 1064);
-
-        HandleItemCollection(player);
 
         SDL_RenderClear(renderer);
         map.Draw(renderer, 1280, 960);
@@ -165,8 +159,6 @@ int SDL_main(int argc, char* argv[])
         for (auto& item : itemList)   item.Render(renderer, map.camX);
 
         RenderPlayer(&player, map.camX, map.camY);
-        HandleBulletCollisionWithSpike(&player, spike);
-
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
