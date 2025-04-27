@@ -8,43 +8,49 @@ cách 1: download file.zip theo đường link sau: https://github.com/nguyentie
 cách 2: tải trực tiếp code về, tải các file ảnh và âm thanh về sau đó cài các sdl liên quan. 
 
 # cách thành phần chính trong game:
-![nhân vật](picture/1.png) 
-![quái](picture/botdeath1.png)
-![gai lớn](picture/spike1.png)
+<img src="picture/1.png" width="192" height="192">  <p align="center"><em>Ghi chú: Đây là player.</em></p>
+<img src="picture/botdeath1.png" width="192" height="192"> <p align="center"><em>Ghi chú: Đây là con bot.</em></p>
+<img src="picture/spike1.png" width="192" height="384"> <p align="center"><em>Ghi chú: Đây là gai lớn.</em></p>
+<img src="picture/jump.png" width="128" height="128"> <p align="center"><em>Ghi chú: Đây là item boost nhảy cao.</em></p>
+<img src="picture/speed.png" width="128" height="128"> <p align="center"><em>Ghi chú: Đây là item boost tốc chạy.</em></p> 
+<img src="picture/dieitem.png" width="128" height="128"> <p align="center"><em>Ghi chú: Đây là item ăn vào chết luôn.</em></p>
 
-Khi bắt đầu game một menu sẽ hiện ra:
+-Khi bắt đầu game một menu sẽ hiện ra:
+-
 ![menu](picture/menu.png)
-có thể bấm chuột vào biểu tượng hình play để chơi
-khi chết menu die sẽ hiện ra 
+-có thể bấm chuột vào biểu tượng hình play để chơi
+khi chết hoặc chiến thắng menu sau sẽ hiện ra:
+-
 ![menudie](picture/menudie.png)
-bấm vào replay để chơi lại ngay, menu thì sẽ về giao diện lúc đầu game;
+-bấm vào replay để chơi lại ngay, menu thì sẽ về giao diện lúc đầu game;
+-
 
 # cơ chế hoạt động
--khi mới run code màn hình menu sẽ hiện ra với nhạc nền;
+-Khi mới run code màn hình menu sẽ hiện ra với nhạc nền;
 -
--khi vào game play:
-  -
-  di chuyển bằng    a:sang trái    d:sang phải    space:nhảy     j:bắn      k:nhảy
-  -
--Sẽ có những map và những con quái ở đó bạn cần bắn chết hoặc nhảy qua nó để đi tiếp;
+-Bấm play để chơi
 -
--Con bot sẽ biết bạn đang ở gần nếu bạn nằm trong bán kính mà nó check được, nếu check được nó sẽ lập tức tăng tốc đến chỗ bạn và chém bạn;
+-Di chuyển bằng    a:sang trái    d:sang phải    space:nhảy     j:bắn      k:nhảy
+-
+-Sẽ có những con quái ở đó bạn cần bắn chết hoặc nhảy qua nó để đi tiếp, mỗi con quái sẽ random rơi ra 1 trong 3 item ở trên. Item speed và jump thì sẽ có tác dụng trong 5 giây còn Item die thì ăn vào chết ngay;
+-
+-Con bot sẽ biết bạn đang ở gần nếu bạn nằm trong tầm mà nó check được(độ cao chênh lệnh là 2 ô và khoảng cách chênh lệnh < 6 ô), nếu check được nó sẽ lập tức tăng tốc đến chỗ bạn và chém bạn;
 -
 -Về cái gai khổng lồ nó chỉ bắt đầu di chuyển sau khi bạn bấm vào game và thực hiện 1 hành động nào đó(để tránh bấm play bị lag xong bị gai cán chết ngay )
 -
--Khi đuổi theo bạn nếu bạn chạy quá nhanh và gai sắp tuột ra khỏi màn hình thì gai sẽ tự tăng tốc để luôn ở trong màn hình(nếu để bạn đi xa quá thì sẽ không còn kịch tính)
+-Khi đuổi theo bạn nếu bạn chạy quá nhanh và gai sắp tuột ra khỏi màn hình thì gai sẽ tự tăng tốc để luôn ở trong màn hình(nếu để bạn đi xa quá thì sẽ không còn kịch tính), ngoài ra nếu nó sắp cán được bạn bạn có thể bắn vào nó nó sẽ đi chậm lại trong 3 giây
 -
 -Gai khi cán vào con bot cũng sẽ khiến con bot chết;
 -
--Ngoài ra gai sẽ dừng lại trước 4 tiled ở cuối map và tiếp tục xoay ở đó, người chơi không kịp về đích thì chỉ cần đi đến đó là an toàn;
+-Ngoài ra gai sẽ dừng lại trước 4 tiled ở cuối map và tiếp tục xoay ở đó;
 -
 -Player sẽ chết khi bị bot chém, chạm vào gai, rơi xuống đáy màn hình ( map sẽ có những chỗ không có chỗ đứng );
 -
--Khi chết âm thanh gameover hiện lên và menudie sẽ hiện lên cho bạn 2 lựa chọn 1 là về menu chính 2 là chơi lại ngay;
+-Khi chết âm thanh gameover hiện lên và menu sẽ hiện lên cho bạn 2 lựa chọn 1 là về menu chính 2 là chơi lại ngay;
 -
--Khi thắng âm thanh victory hiện lên và menudie cũng sẽ lên cho bạn 2 lựa chọn tương tự;
+-Khi thắng âm thanh victory hiện lên và menu cũng sẽ lên cho bạn 2 lựa chọn tương tự, bạn sẽ thắng khi chạm vào cuối map bên phải;
 -
--Hơn nữa trong xuốt quá trình chơi game sẽ luôn có nhạc;
+-Hơn nữa trong suốt quá trình chơi game sẽ luôn có nhạc;
 -
 
 # Đồ họa:
@@ -54,13 +60,15 @@ bấm vào replay để chơi lại ngay, menu thì sẽ về giao diện lúc �
 -
 -âm thanh: mạng
 -
--Tất cả các file đều free trên mạng và có trong picture.zip và music.zip;
+-Tất cả các file đều free trên mạng và có trong file picture;
 -
 
 # Ý tưởng:
--Chính: fakemg (youtube)
+-fakemg (youtube)
 -
 
 # Nguồn tham khảo:
--Vì game là private nên không tìm được source công khai nên không tìm được code có sẵn;
+-Ý tưởng game: https://www.youtube.com/watch?v=ObEOK7HSq2E, tham khảo code: https://www.youtube.com/watch?v=KsG6dJlLBDw&list=PL2RPjWnJduNmXHRYwdtublIPdlqocBoLS
+-
+-Vì game là private nên không tìm được source công khai nên không có code sẵn;
 -
