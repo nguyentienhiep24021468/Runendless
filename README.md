@@ -1,5 +1,5 @@
 # TOWER FORTRESS
-link video demo: 
+link video demo: https://drive.google.com/file/d/1PMYi7Fz9CwDZ4cpX-M97AzwDw19ly5u_/view?usp=sharing
 # Giới thiệu về game
 Tower Fortress là dạng game nhập vai. Bạn bị mắc kẹt trong 1 mê cung và bạn cần phải thoát ra, trong mê cung sẽ có những con vật muốn giết bạn, 1 cái gai khổng lồ đuổi theo bạn, và những cái hố sẽ khiến bạn chết nếu rơi xuống. Việc của bạn là đi đến cuối mê cung để thoát ra ngoài.
 # cách tải game 
@@ -51,6 +51,14 @@ khi chết hoặc chiến thắng menu sau sẽ hiện ra:
 -Khi thắng âm thanh victory hiện lên và menu cũng sẽ lên cho bạn 2 lựa chọn tương tự, bạn sẽ thắng khi chạm vào cuối map bên phải;
 -
 -Hơn nữa trong suốt quá trình chơi game sẽ luôn có nhạc;
+-
+
+# Cải tiến so với game gốc:
+-Bot sẽ biết player ở gần để đi tới
+-
+-Spike bị làm chậm nếu bị bắn trúng
+-
+-Bot rớt item
 -
 
 # Đồ họa:
