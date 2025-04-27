@@ -56,10 +56,9 @@ SDL_Rect Item::GetRect() const {
 
 bool Item::CheckCollision(const SDL_Rect& playerRect) {
     SDL_Rect itemRect = GetRect();
-    return SDL_HasIntersection(&playerRect, &itemRect);  // Kiểm tra va chạm với player
+    return SDL_HasIntersection(&playerRect, &itemRect);
 }
 
-// Hàm spawn item ngẫu nhiên
 void SpawnItem(float x, float y) {
     int random = rand() % 3; // 0, 1, 2
     ItemType type = ITEM_NONE;
@@ -71,7 +70,6 @@ void SpawnItem(float x, float y) {
     itemList.push_back(Item(x, y, type));
 }
 
-// Hàm load texture cho item
 void LoadItemTextures(SDL_Renderer* renderer) {
     speedTexture = IMG_LoadTexture(renderer, "picture/speed.png");
     jumpTexture = IMG_LoadTexture(renderer, "picture/jump.png");
@@ -82,31 +80,28 @@ void LoadItemTextures(SDL_Renderer* renderer) {
     }
 }
 
-// Hàm free texture khi game kết thúc
 void FreeItemTextures() {
     if (speedTexture) SDL_DestroyTexture(speedTexture);
     if (jumpTexture) SDL_DestroyTexture(jumpTexture);
     if (deadTexture) SDL_DestroyTexture(deadTexture);
 }
 
-// Hàm xử lý khi player nhặt item
 void HandleItemCollection(Player& player) {
-    SDL_Rect playerRect = player.GetRect();  // Lấy hình chữ nhật của player
+    SDL_Rect playerRect = player.GetRect();
 
     for (auto& item : itemList) {
-        if (!item.isCollected && item.CheckCollision(playerRect)) {  // Nếu chưa nhặt và có va chạm
+        if (!item.isCollected && item.CheckCollision(playerRect)) {  
             item.isCollected = true;  // Đánh dấu item đã được nhặt
 
-            // Áp dụng tác dụng của item
             switch (item.GetType()) {
                 case ITEM_SPEED:
-                    BoostSpeed(player);  // Gọi hàm tăng tốc
+                    BoostSpeed(player);
                     break;
                 case ITEM_JUMP:
-                    BoostJump(player);  // Gọi hàm tăng nhảy cao
+                    BoostJump(player);  
                     break;
                 case ITEM_DEAD:
-                    player.isDead = true;  // Nếu là item DEAD thì làm player chết
+                    player.isDead = true;
                     break;
                 default:
                     break;
@@ -117,12 +112,9 @@ void HandleItemCollection(Player& player) {
 
 void GameLoop(Player& player, SDL_Renderer* renderer, float deltaTime) {
     // Kiểm tra va chạm vật phẩm
-    HandleItemCollection(player);  // Kiểm tra và xử lý khi player nhặt vật phẩm
-
-    // Cập nhật các vật phẩm trong game (nếu có thay đổi trạng thái hoặc hiệu ứng)
-    // Render các vật phẩm trên màn hình
+    HandleItemCollection(player); 
     for (auto& item : itemList) {
-        item.Render(renderer, map.camX);  // Render vật phẩm
+        item.Render(renderer, map.camX);
     }
 }
 
